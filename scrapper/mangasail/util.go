@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/bigscreen/manga-scrapper/common"
 	"github.com/chromedp/chromedp"
 )
 
@@ -25,4 +26,12 @@ func getCrawledHtmlDocument(ctx context.Context, url string, waitJSPathSel strin
 	}
 
 	return goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
+}
+
+func buildPageURL(path string) string {
+	return common.MangasailBaseURL + path
+}
+
+func getIdFromPath(path string) string {
+	return strings.TrimPrefix(path, common.MangasailPrefixPath)
 }

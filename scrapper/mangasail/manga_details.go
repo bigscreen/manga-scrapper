@@ -9,51 +9,47 @@ import (
 	"github.com/bigscreen/manga-scrapper/domain"
 )
 
-type DetailsPageScrapper interface {
-	GetContent(path string) (domain.MangasailManga, error)
+type MangaDetailsPageScrapper interface {
+	GetContent(path string) (domain.Manga, error)
 }
 
-type detailsScrapper struct {
+type mangaDetailsScrapper struct {
 	chromeCtx context.Context
 }
 
-func NewDetailsPageScrapper(chromeCtx context.Context) DetailsPageScrapper {
-	return detailsScrapper{chromeCtx: chromeCtx}
+func NewMangaDetailsPageScrapper(chromeCtx context.Context) MangaDetailsPageScrapper {
+	return mangaDetailsScrapper{chromeCtx: chromeCtx}
 }
 
-func (d detailsScrapper) GetContent(path string) (domain.MangasailManga, error) {
+func (m mangaDetailsScrapper) GetContent(path string) (domain.Manga, error) {
 	waitSelector := `document.querySelector("#node-254222")`
 	wantedSelector := `document.querySelector("body > section > div > div > div.main-table > div > section > div")`
-	document, err := getCrawledHtmlDocument(d.chromeCtx, d.buildDetailsURL(path), waitSelector, wantedSelector)
+	document, err := getCrawledHtmlDocument(m.chromeCtx, buildPageURL(path), waitSelector, wantedSelector)
 	if err != nil {
 		fmt.Println("GetDetailsContent, failed to get html document, err:", err)
-		return domain.MangasailManga{}, err
+		return domain.Manga{}, err
 	}
 
-	return d.buildDetailsContent(document), nil
+	return m.buildDetailsContent(document), nil
 }
 
-func (d detailsScrapper) buildDetailsURL(path string) string {
-	return HomeURL + path
-}
-
-func (d detailsScrapper) buildDetailsContent(document *goquery.Document) domain.MangasailManga {
+func (m mangaDetailsScrapper) buildDetailsContent(document *goquery.Document) domain.Manga {
 	if document == nil {
-		return domain.MangasailManga{}
+		return domain.Manga{}
 	}
 
-	attributesChannel := make(chan domain.MangasailManga)
-	chaptersChannel := make(chan domain.MangasailChapters)
+	attributesChannel := make(chan domain.Manga)
+	chaptersChannel := make(chan domain.Chapters)
 	defer func() {
 		close(attributesChannel)
 		close(chaptersChannel)
 	}()
 
 	go func() {
-		attributesChannel <- d.getAttributes(*document)
+		attributesChannel <- m.getAttributes(*document)
 	}()
 	go func() {
-		chaptersChannel <- d.getChapters(*document)
+		chaptersChannel <- m.getChapters(*document)
 	}()
 
 	manga := <-attributesChannel
@@ -61,8 +57,8 @@ func (d detailsScrapper) buildDetailsContent(document *goquery.Document) domain.
 	return manga
 }
 
-func (d detailsScrapper) getAttributes(document goquery.Document) domain.MangasailManga {
-	manga := domain.MangasailManga{}
+func (m mangaDetailsScrapper) getAttributes(document goquery.Document) domain.Manga {
+	manga := domain.Manga{}
 	document.Find(".main-content-inner").Each(func(pos int, selection *goquery.Selection) {
 		manga.Name = selection.Find("h1.page-header").Text()
 		selection.Find("#node-254222 .content").Each(func(nPos int, nSelection *goquery.Selection) {
@@ -70,7 +66,7 @@ func (d detailsScrapper) getAttributes(document goquery.Document) domain.Mangasa
 			manga.ReleaseYear = nSelection.Find(".field-name-field-year-of-release .field-items .field-item").Text()
 			manga.Status = nSelection.Find(".field-name-field-status .field-items .field-item").Text()
 			manga.Author = nSelection.Find(".field-name-field-author .field-items .field-item").Text()
-			manga.Description = d.formatMangaDescription(nSelection.Find(".field-name-body .field-items .field-item p").Text())
+			manga.Description = m.formatMangaDescription(nSelection.Find(".field-name-body .field-items .field-item p").Text())
 			var genres []string
 			nSelection.Find(".field-name-field-genres .field-items .field-item").
 				Each(func(gPos int, gSelection *goquery.Selection) {
@@ -82,22 +78,23 @@ func (d detailsScrapper) getAttributes(document goquery.Document) domain.Mangasa
 	return manga
 }
 
-func (d detailsScrapper) formatMangaDescription(s string) string {
+func (m mangaDetailsScrapper) formatMangaDescription(s string) string {
 	ns := strings.ReplaceAll(s, `"`, "")
 	ns = strings.ReplaceAll(s, "<br>", "")
 	ns = strings.ReplaceAll(s, "\n", " ")
 	return ns
 }
 
-func (d detailsScrapper) getChapters(document goquery.Document) domain.MangasailChapters {
-	var chapters domain.MangasailChapters
+func (m mangaDetailsScrapper) getChapters(document goquery.Document) domain.Chapters {
+	var chapters domain.Chapters
 	document.Find("#node-254222 table.chlist tbody tr").Each(func(pos int, selection *goquery.Selection) {
-		chapter := domain.MangasailChapter{}
+		chapter := domain.Chapter{}
 		selection.Find("td").Each(func(tPos int, tSelection *goquery.Selection) {
 			if tPos == 0 {
 				aSelection := tSelection.Find("a")
 				chapter.Title = aSelection.Text()
-				chapter.Path, _ = aSelection.Attr("href")
+				chapterPath, _ := aSelection.Attr("href")
+				chapter.ID = getIdFromPath(chapterPath)
 			} else {
 				chapter.LastModified = tSelection.Text()
 			}

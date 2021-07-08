@@ -35,9 +35,9 @@ func initChromeDpContext() (context.Context, context.CancelFunc) {
 func fetchMangasailContent(chromeCtx context.Context) {
 	fetchMangasailHomeContent(chromeCtx)
 	fmt.Println("---------------------")
-	fetchMangasailDetailsContent(chromeCtx)
+	fetchMangasailMangaDetailsContent(chromeCtx)
 	fmt.Println("---------------------")
-	fetchMangasailReaderContent(chromeCtx)
+	fetchMangasailChapterDetailsContent(chromeCtx)
 }
 
 func fetchMangasailHomeContent(chromeCtx context.Context) {
@@ -50,22 +50,22 @@ func fetchMangasailHomeContent(chromeCtx context.Context) {
 	fmt.Println("fetchMangasailHomeContent, result:", content.ToString())
 }
 
-func fetchMangasailDetailsContent(chromeCtx context.Context) {
-	detailsScrapper := mangasail.NewDetailsPageScrapper(chromeCtx)
+func fetchMangasailMangaDetailsContent(chromeCtx context.Context) {
+	detailsScrapper := mangasail.NewMangaDetailsPageScrapper(chromeCtx)
 	content, err := detailsScrapper.GetContent("/content/checkmate-manga")
 	if err != nil {
-		fmt.Println("fetchMangasailDetailsContent, error:", err)
+		fmt.Println("fetchMangasailMangaDetailsContent, error:", err)
 		return
 	}
-	fmt.Println("fetchMangasailDetailsContent, result:", content.ToString())
+	fmt.Println("fetchMangasailMangaDetailsContent, result:", content.ToString())
 }
 
-func fetchMangasailReaderContent(chromeCtx context.Context) {
-	detailsScrapper := mangasail.NewReaderPageScrapper(chromeCtx)
+func fetchMangasailChapterDetailsContent(chromeCtx context.Context) {
+	detailsScrapper := mangasail.NewChapterDetailsPageScrapper(chromeCtx)
 	content, err := detailsScrapper.GetContent("/content/checkmate-35")
 	if err != nil {
-		fmt.Println("fetchMangasailReaderContent, error:", err)
+		fmt.Println("fetchMangasailChapterDetailsContent, error:", err)
 		return
 	}
-	fmt.Println("fetchMangasailReaderContent, result:", content.ToString())
+	fmt.Println("fetchMangasailChapterDetailsContent, result:", content.ToString())
 }
