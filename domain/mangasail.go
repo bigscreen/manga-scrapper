@@ -5,6 +5,7 @@ import "encoding/json"
 type (
 	MangasailMangas   []MangasailManga
 	MangasailChapters []MangasailChapter
+	MangasailImages   []MangasailImage
 )
 
 type MangasailManga struct {
@@ -20,9 +21,15 @@ type MangasailManga struct {
 }
 
 type MangasailChapter struct {
-	Title        string `json:"title,omitempty"`
-	Path         string `json:"path,omitempty"`
-	LastModified string `json:"last_modified,omitempty"`
+	Title        string          `json:"title,omitempty"`
+	Path         string          `json:"path,omitempty"`
+	LastModified string          `json:"last_modified,omitempty"`
+	Images       MangasailImages `json:"images,omitempty"`
+}
+
+type MangasailImage struct {
+	ID       string `json:"id,omitempty"`
+	ImageURL string `json:"image_url,omitempty"`
 }
 
 type MangasailHomeMangas struct {
@@ -37,6 +44,10 @@ func (m MangasailManga) ToString() string {
 }
 
 func (m MangasailChapter) ToString() string {
+	return getJson(m)
+}
+
+func (m MangasailImage) ToString() string {
 	return getJson(m)
 }
 

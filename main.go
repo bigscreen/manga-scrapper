@@ -36,6 +36,8 @@ func fetchMangasailContent(chromeCtx context.Context) {
 	fetchMangasailHomeContent(chromeCtx)
 	fmt.Println("---------------------")
 	fetchMangasailDetailsContent(chromeCtx)
+	fmt.Println("---------------------")
+	fetchMangasailReaderContent(chromeCtx)
 }
 
 func fetchMangasailHomeContent(chromeCtx context.Context) {
@@ -56,4 +58,14 @@ func fetchMangasailDetailsContent(chromeCtx context.Context) {
 		return
 	}
 	fmt.Println("fetchMangasailDetailsContent, result:", content.ToString())
+}
+
+func fetchMangasailReaderContent(chromeCtx context.Context) {
+	detailsScrapper := mangasail.NewReaderPageScrapper(chromeCtx)
+	content, err := detailsScrapper.GetContent("/content/checkmate-35")
+	if err != nil {
+		fmt.Println("fetchMangasailReaderContent, error:", err)
+		return
+	}
+	fmt.Println("fetchMangasailReaderContent, result:", content.ToString())
 }
