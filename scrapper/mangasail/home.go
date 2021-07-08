@@ -2,17 +2,10 @@ package mangasail
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bigscreen/manga-scrapper/domain"
-	"github.com/chromedp/chromedp"
-)
-
-const (
-	homeURL = "https://www.mangasail.co"
 )
 
 type HomePageScrapper interface {
@@ -30,31 +23,13 @@ func NewHomePageScrapper(chromeCtx context.Context) HomePageScrapper {
 func (h homeScrapper) GetContent() (domain.MangasailHomeMangas, error) {
 	waitSelector := `document.querySelector("#block-showmanga-hot-today")`
 	wantedSelector := `document.querySelector("body > section > div > div > div.main-table > div")`
-	document, err := h.getCrawledHtmlDocument(homeURL, waitSelector, wantedSelector)
+	document, err := getCrawledHtmlDocument(h.chromeCtx, HomeURL, waitSelector, wantedSelector)
 	if err != nil {
 		fmt.Println("GetHomeContent, failed to get html document, err:", err)
 		return domain.MangasailHomeMangas{}, err
 	}
 
 	return h.buildHomeContent(document), nil
-}
-
-func (h homeScrapper) getCrawledHtmlDocument(url string, waitJSPathSel string, wantedJSPathSel string) (*goquery.Document, error) {
-	var htmlContent string
-	err := chromedp.Run(
-		h.chromeCtx,
-		chromedp.Navigate(url),
-		chromedp.WaitVisible(waitJSPathSel, chromedp.ByJSPath),
-		chromedp.OuterHTML(wantedJSPathSel, &htmlContent, chromedp.ByJSPath),
-	)
-	if err != nil {
-		return nil, err
-	}
-	if htmlContent == "" {
-		return nil, errors.New("empty html content")
-	}
-
-	return goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
 }
 
 func (h homeScrapper) buildHomeContent(document *goquery.Document) domain.MangasailHomeMangas {
@@ -73,8 +48,8 @@ func (h homeScrapper) buildHomeContent(document *goquery.Document) domain.Mangas
 		close(newMangasChannel)
 	}()
 
-	execute := func(c chan domain.MangasailMangas, f func(*goquery.Document) domain.MangasailMangas) {
-		c <- f(document)
+	execute := func(c chan domain.MangasailMangas, f func(goquery.Document) domain.MangasailMangas) {
+		c <- f(*document)
 	}
 	go execute(dailyHotMangasChannel, h.getDailyHotMangas)
 	go execute(latestMangasChannel, h.getLatestMangas)
@@ -89,7 +64,7 @@ func (h homeScrapper) buildHomeContent(document *goquery.Document) domain.Mangas
 	}
 }
 
-func (h homeScrapper) getDailyHotMangas(document *goquery.Document) domain.MangasailMangas {
+func (h homeScrapper) getDailyHotMangas(document goquery.Document) domain.MangasailMangas {
 	var mangas domain.MangasailMangas
 	document.Find("#block-showmanga-hot-today .content #hottoday-list").
 		Each(func(pos int, selection *goquery.Selection) {
@@ -108,7 +83,7 @@ func (h homeScrapper) getDailyHotMangas(document *goquery.Document) domain.Manga
 	return mangas
 }
 
-func (h homeScrapper) getLatestMangas(document *goquery.Document) domain.MangasailMangas {
+func (h homeScrapper) getLatestMangas(document goquery.Document) domain.MangasailMangas {
 	var mangas domain.MangasailMangas
 	document.Find("#block-showmanga-lastest-list #latest-list").
 		Each(func(pos int, selection *goquery.Selection) {
@@ -143,7 +118,7 @@ func (h homeScrapper) getLatestMangas(document *goquery.Document) domain.Mangasa
 	return mangas
 }
 
-func (h homeScrapper) getHotMangas(document *goquery.Document) domain.MangasailMangas {
+func (h homeScrapper) getHotMangas(document goquery.Document) domain.MangasailMangas {
 	var mangas domain.MangasailMangas
 	document.Find("#block-showmanga-hot-manga #new-list").
 		Each(func(pos int, selection *goquery.Selection) {
@@ -173,7 +148,7 @@ func (h homeScrapper) getHotMangas(document *goquery.Document) domain.MangasailM
 	return mangas
 }
 
-func (h homeScrapper) getNewMangas(document *goquery.Document) domain.MangasailMangas {
+func (h homeScrapper) getNewMangas(document goquery.Document) domain.MangasailMangas {
 	var mangas domain.MangasailMangas
 	document.Find("#block-showmanga-new-manga #new-list").
 		Each(func(pos int, selection *goquery.Selection) {

@@ -33,11 +33,27 @@ func initChromeDpContext() (context.Context, context.CancelFunc) {
 }
 
 func fetchMangasailContent(chromeCtx context.Context) {
+	fetchMangasailHomeContent(chromeCtx)
+	fmt.Println("---------------------")
+	fetchMangasailDetailsContent(chromeCtx)
+}
+
+func fetchMangasailHomeContent(chromeCtx context.Context) {
 	homeScrapper := mangasail.NewHomePageScrapper(chromeCtx)
 	content, err := homeScrapper.GetContent()
 	if err != nil {
-		fmt.Println("fetchMangasailContent, error:", err)
+		fmt.Println("fetchMangasailHomeContent, error:", err)
 		return
 	}
-	fmt.Println("fetchMangasailContent, result:", content.ToString())
+	fmt.Println("fetchMangasailHomeContent, result:", content.ToString())
+}
+
+func fetchMangasailDetailsContent(chromeCtx context.Context) {
+	detailsScrapper := mangasail.NewDetailsPageScrapper(chromeCtx)
+	content, err := detailsScrapper.GetContent("/content/checkmate-manga")
+	if err != nil {
+		fmt.Println("fetchMangasailDetailsContent, error:", err)
+		return
+	}
+	fmt.Println("fetchMangasailDetailsContent, result:", content.ToString())
 }
