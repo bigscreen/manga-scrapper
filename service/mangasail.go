@@ -62,10 +62,10 @@ func (m mangasailService) GetMangaDetails(mangaId string) (contract.Manga, error
 	}
 
 	return contract.Manga{
-		PageTitle:      c.Name,
-		HeaderImageURL: c.IconURL,
-		Info:           info,
-		Chapters:       chapters,
+		PageTitle:     c.Name,
+		CoverImageURL: c.IconURL,
+		Info:          info,
+		Chapters:      chapters,
 	}, nil
 }
 

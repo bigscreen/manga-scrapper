@@ -1,10 +1,10 @@
 package contract
 
 type Manga struct {
-	PageTitle      string         `json:"page_title"`
-	HeaderImageURL string         `json:"header_image_url"`
-	Info           MangaInfo      `json:"info"`
-	Chapters       []MangaChapter `json:"chapters"`
+	PageTitle     string         `json:"page_title"`
+	CoverImageURL string         `json:"cover_image_url"`
+	Info          MangaInfo      `json:"info"`
+	Chapters      []MangaChapter `json:"chapters"`
 }
 
 type MangaInfo struct {

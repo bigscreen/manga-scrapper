@@ -153,8 +153,8 @@ func (m *MangasailServiceTestSuite) TestGetMangaDetails() {
 			name:           "WhenSuccessFromScrapper",
 			scrapperResult: m.getMangas()[0],
 			expectedResult: contract.Manga{
-				PageTitle:      "Manga A",
-				HeaderImageURL: "https://icon.jpg",
+				PageTitle:     "Manga A",
+				CoverImageURL: "https://icon.jpg",
 				Info: contract.MangaInfo{
 					Author:      "Mr X",
 					Status:      "Ongoing",
