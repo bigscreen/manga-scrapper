@@ -88,7 +88,7 @@ func (m mangasailService) GetChapterDetails(chapterId string) (contract.Chapter,
 
 func (m mangasailService) buildDailyHotMangasHomeCard(mangas domain.Mangas) contract.HomeCard {
 	card := contract.HomeCard{
-		Identifier: "daily_hot_mangas",
+		Identifier: contract.HomeCardDailyHotMangas,
 		Label:      "Daily Hot Manga Chapter",
 		Content:    []contract.HomeCardContent{},
 	}
@@ -112,7 +112,7 @@ func (m mangasailService) buildDailyHotMangasHomeCard(mangas domain.Mangas) cont
 
 func (m mangasailService) buildPopularMangasHomeCard(mangas domain.Mangas) contract.HomeCard {
 	card := contract.HomeCard{
-		Identifier: "popular_mangas",
+		Identifier: contract.HomeCardPopularMangas,
 		Label:      "Popular Manga",
 		Content:    []contract.HomeCardContent{},
 	}
@@ -136,7 +136,7 @@ func (m mangasailService) buildPopularMangasHomeCard(mangas domain.Mangas) contr
 
 func (m mangasailService) buildLatestMangasHomeCard(mangas domain.Mangas) contract.HomeCard {
 	card := contract.HomeCard{
-		Identifier: "latest_mangas",
+		Identifier: contract.HomeCardLatestMangas,
 		Label:      "Latest Updated Manga",
 		Content:    []contract.HomeCardContent{},
 	}
@@ -162,7 +162,7 @@ func (m mangasailService) buildLatestMangasHomeCard(mangas domain.Mangas) contra
 
 func (m mangasailService) buildNewMangasHomeCard(mangas domain.Mangas) contract.HomeCard {
 	card := contract.HomeCard{
-		Identifier: "new_mangas",
+		Identifier: contract.HomeCardNewMangas,
 		Label:      "New Released Manga",
 		Content:    []contract.HomeCardContent{},
 	}

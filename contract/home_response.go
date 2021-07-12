@@ -1,10 +1,16 @@
 package contract
 
 type RedirectType string
+type HomeCardIdentifier string
 
 const (
 	RedirectToManga   RedirectType = "to_manga"
 	RedirectToChapter RedirectType = "to_chapter"
+
+	HomeCardDailyHotMangas HomeCardIdentifier = "daily_hot_mangas"
+	HomeCardPopularMangas  HomeCardIdentifier = "popular_mangas"
+	HomeCardLatestMangas   HomeCardIdentifier = "latest_mangas"
+	HomeCardNewMangas      HomeCardIdentifier = "new_mangas"
 )
 
 type Home struct {
@@ -13,9 +19,9 @@ type Home struct {
 }
 
 type HomeCard struct {
-	Identifier string            `json:"identifier"`
-	Label      string            `json:"label"`
-	Content    []HomeCardContent `json:"content"`
+	Identifier HomeCardIdentifier `json:"identifier"`
+	Label      string             `json:"label"`
+	Content    []HomeCardContent  `json:"content"`
 }
 
 type HomeCardContent struct {

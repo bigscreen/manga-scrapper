@@ -3,12 +3,12 @@ package mangasail
 import (
 	"context"
 	"errors"
-	"github.com/bigscreen/manga-scrapper/config"
 	"log"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bigscreen/manga-scrapper/common"
+	"github.com/bigscreen/manga-scrapper/config"
 	"github.com/chromedp/chromedp"
 )
 
