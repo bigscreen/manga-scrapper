@@ -36,7 +36,3 @@ type HomeCardRedirection struct {
 	ID   string       `json:"id"`
 	Type RedirectType `json:"type"`
 }
-
-func (m Home) String() string {
-	return getJson(m)
-}

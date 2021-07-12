@@ -20,7 +20,3 @@ type MangaChapter struct {
 	Title        string `json:"title,omitempty"`
 	LastModified string `json:"last_modified,omitempty"`
 }
-
-func (m Manga) String() string {
-	return getJson(m)
-}
