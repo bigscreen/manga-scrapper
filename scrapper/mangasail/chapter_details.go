@@ -1,31 +1,27 @@
 package mangasail
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bigscreen/manga-scrapper/domain"
+	"github.com/bigscreen/manga-scrapper/logger"
 )
 
 type ChapterDetailsPageScrapper interface {
 	GetContent(path string) (domain.Chapter, error)
 }
 
-type chapterDetailsScrapper struct {
-	chromeCtx context.Context
-}
+type chapterDetailsScrapper struct{}
 
-func NewChapterDetailsPageScrapper(chromeCtx context.Context) ChapterDetailsPageScrapper {
-	return chapterDetailsScrapper{chromeCtx: chromeCtx}
+func NewChapterDetailsPageScrapper() ChapterDetailsPageScrapper {
+	return chapterDetailsScrapper{}
 }
 
 func (c chapterDetailsScrapper) GetContent(path string) (domain.Chapter, error) {
 	waitSelector := `document.querySelector("#node-337513")`
 	wantedSelector := `document.querySelector("body > section > div > div > div > div > section > div")`
-	document, err := getCrawledHtmlDocument(c.chromeCtx, buildPageURL(path), waitSelector, wantedSelector)
+	document, err := getCrawledHtmlDocument(buildPageURL(path), waitSelector, wantedSelector)
 	if err != nil {
-		fmt.Println("GetReaderContent, failed to get html document, err:", err)
+		logger.Error("GetChapterDetailsContent, failed to get html document, err:", err)
 		return domain.Chapter{}, err
 	}
 

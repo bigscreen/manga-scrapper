@@ -1,0 +1,6 @@
+APP_NAME: "mangajack"
+
+APP_PORT: "4545"
+LOG_LEVEL: "debug"
+
+CHROME_DP_TIMEOUT_SECONDS: 20

@@ -3,6 +3,8 @@ package mangasail
 import (
 	"context"
 	"errors"
+	"github.com/bigscreen/manga-scrapper/config"
+	"log"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -10,7 +12,10 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-func getCrawledHtmlDocument(ctx context.Context, url string, waitJSPathSel string, wantedJSPathSel string) (*goquery.Document, error) {
+func getCrawledHtmlDocument(url string, waitJSPathSel string, wantedJSPathSel string) (*goquery.Document, error) {
+	ctx, cancel := getChromeDpContext()
+	defer cancel()
+
 	var htmlContent string
 	err := chromedp.Run(
 		ctx,
@@ -26,6 +31,19 @@ func getCrawledHtmlDocument(ctx context.Context, url string, waitJSPathSel strin
 	}
 
 	return goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
+}
+
+func getChromeDpContext() (context.Context, context.CancelFunc) {
+	options := []chromedp.ExecAllocatorOption{
+		chromedp.Flag("headless", true), // debug usage
+		chromedp.Flag("blink-settings", "imagesEnabled=false"),
+		chromedp.UserAgent(`Chrome/73.0.3683.103`),
+	}
+	options = append(chromedp.DefaultExecAllocatorOptions[:], options...)
+	allocatorCtx, cancel := chromedp.NewExecAllocator(context.Background(), options...)
+	chromeCtx, cancel := chromedp.NewContext(allocatorCtx, chromedp.WithLogf(log.Printf))
+	chromeCtx, cancel = context.WithTimeout(chromeCtx, config.ChromeDPTimeout())
+	return chromeCtx, cancel
 }
 
 func buildPageURL(path string) string {
