@@ -35,9 +35,12 @@ func getCrawledHtmlDocument(url string, waitJSPathSel string, wantedJSPathSel st
 
 func getChromeDpContext() (context.Context, context.CancelFunc) {
 	options := []chromedp.ExecAllocatorOption{
-		chromedp.Flag("headless", true), // debug usage
+		chromedp.Headless,
+		chromedp.DisableGPU,
+		chromedp.NoDefaultBrowserCheck,
 		chromedp.Flag("blink-settings", "imagesEnabled=false"),
-		chromedp.UserAgent(`Chrome/73.0.3683.103`),
+		chromedp.UserAgent("Chrome/77.0.3830.0"),
+		chromedp.WindowSize(1920, 1080),
 	}
 	options = append(chromedp.DefaultExecAllocatorOptions[:], options...)
 	allocatorCtx, cancel := chromedp.NewExecAllocator(context.Background(), options...)
