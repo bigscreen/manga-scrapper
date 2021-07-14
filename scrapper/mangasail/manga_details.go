@@ -5,7 +5,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bigscreen/manga-scrapper/domain"
-	"github.com/bigscreen/manga-scrapper/logger"
+	"github.com/bigscreen/manga-scrapper/errors"
 )
 
 type MangaDetailsPageScrapper interface {
@@ -19,12 +19,12 @@ func NewMangaDetailsPageScrapper() MangaDetailsPageScrapper {
 }
 
 func (m mangaDetailsScrapper) GetContent(path string) (domain.Manga, error) {
+	const op = "MangaDetailsPageScrapper.GetContent"
 	waitSelector := `document.querySelector("#node-254222")`
 	wantedSelector := `document.querySelector("body > section > div > div > div.main-table > div > section > div")`
 	document, err := getCrawledHtmlDocument(buildPageURL(path), waitSelector, wantedSelector)
 	if err != nil {
-		logger.Error("GetMangaDetailsContent, failed to get html document, err:", err)
-		return domain.Manga{}, err
+		return domain.Manga{}, errors.New(errors.WithOp(op), errors.WithError(err))
 	}
 
 	return m.buildDetailsContent(document), nil

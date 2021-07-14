@@ -12,13 +12,13 @@ func GetHomeCards(svcMap map[common.FetchServiceKey]service.FetchService) http.H
 	return func(w http.ResponseWriter, r *http.Request) {
 		svc, err := getFetchServiceFromRequest(r, svcMap)
 		if err != nil {
-			respondWith(http.StatusBadRequest, w, contract.NewErrorResponse(err))
+			responseError(w, err)
 			return
 		}
 
 		hr, err := svc.GetHomeCards()
 		if err != nil {
-			respondWith(http.StatusInternalServerError, w, contract.NewErrorResponse(err))
+			responseError(w, err)
 			return
 		}
 		respondWith(http.StatusOK, w, contract.NewSuccessResponse(hr))

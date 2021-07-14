@@ -2,26 +2,26 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/bigscreen/manga-scrapper/common"
 	"github.com/bigscreen/manga-scrapper/contract"
+	"github.com/bigscreen/manga-scrapper/errors"
 	"github.com/bigscreen/manga-scrapper/service"
 )
 
 func getSourceFromRequest(r *http.Request) (string, error) {
-	return getValueFromRequest(r, common.ParamKeySource, "unknown source")
+	return getValueFromRequest(r, common.ParamKeySource, "Source is missing.")
 }
 
 func getIdFromRequest(r *http.Request) (string, error) {
-	return getValueFromRequest(r, common.ParamKeyId, "unknown id")
+	return getValueFromRequest(r, common.ParamKeyId, "Id is missing.")
 }
 
-func getValueFromRequest(r *http.Request, key, errTxt string) (string, error) {
+func getValueFromRequest(r *http.Request, key, errMsg string) (string, error) {
 	s := r.FormValue(key)
 	if len(s) == 0 {
-		return "", errors.New(errTxt)
+		return "", errors.New(errors.WithValidationErrorCode(), errors.WithMessage(errMsg))
 	}
 	return s, nil
 }
@@ -34,7 +34,7 @@ func getFetchServiceFromRequest(r *http.Request, sMap map[common.FetchServiceKey
 
 	svc, ok := sMap[common.FetchServiceKey(source)]
 	if !ok {
-		return nil, errors.New("unknown source")
+		return nil, errors.New(errors.WithValidationErrorCode(), errors.WithMessage("Unknown source."))
 	}
 
 	return svc, nil
@@ -44,4 +44,12 @@ func respondWith(statusCode int, w http.ResponseWriter, response contract.Respon
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	_ = json.NewEncoder(w).Encode(response)
+}
+
+func responseError(w http.ResponseWriter, err error) {
+	code := http.StatusInternalServerError
+	if e := errors.FromError(err); e != nil {
+		code = e.HttpStatusCode()
+	}
+	respondWith(code, w, contract.NewErrorResponse(err))
 }

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"errors"
+	nativeErrs "errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +11,7 @@ import (
 	"github.com/bigscreen/manga-scrapper/common"
 	"github.com/bigscreen/manga-scrapper/config"
 	"github.com/bigscreen/manga-scrapper/contract"
+	"github.com/bigscreen/manga-scrapper/errors"
 	"github.com/bigscreen/manga-scrapper/logger"
 	"github.com/bigscreen/manga-scrapper/mock"
 	"github.com/bigscreen/manga-scrapper/service"
@@ -50,20 +51,20 @@ func (c *ChapterDetailsHandlerTestSuite) TestGetMangaDetails() {
 	}{
 		{
 			name:             "WhenIdIsMissing",
-			expectedResponse: contract.NewErrorResponse(errors.New("unknown id")),
+			expectedResponse: contract.NewErrorResponse(errors.New(errors.WithValidationErrorCode(), errors.WithMessage("Id is missing."))),
 			expectedRespCode: http.StatusBadRequest,
 		},
 		{
 			name:             "WhenIdExistsAndSourceIsEmpty",
 			chapterId:        "chapterID",
-			expectedResponse: contract.NewErrorResponse(errors.New("unknown source")),
+			expectedResponse: contract.NewErrorResponse(errors.New(errors.WithValidationErrorCode(), errors.WithMessage("Source is missing."))),
 			expectedRespCode: http.StatusBadRequest,
 		},
 		{
 			name:             "WhenIdExistsAndSourceIsUnknown",
 			chapterId:        "chapterID",
 			source:           "foo",
-			expectedResponse: contract.NewErrorResponse(errors.New("unknown source")),
+			expectedResponse: contract.NewErrorResponse(errors.New(errors.WithValidationErrorCode(), errors.WithMessage("Unknown source."))),
 			expectedRespCode: http.StatusBadRequest,
 		},
 		{
@@ -80,8 +81,8 @@ func (c *ChapterDetailsHandlerTestSuite) TestGetMangaDetails() {
 			chapterId:        "chapterID",
 			source:           string(common.FSKeyMangasail),
 			serviceResult:    &contract.Chapter{},
-			serviceError:     errors.New("some error"),
-			expectedResponse: contract.NewErrorResponse(errors.New("some error")),
+			serviceError:     nativeErrs.New("some error"),
+			expectedResponse: contract.NewErrorResponse(nativeErrs.New("some error")),
 			expectedRespCode: http.StatusInternalServerError,
 		},
 	}

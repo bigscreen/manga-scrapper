@@ -3,7 +3,7 @@ package mangasail
 import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bigscreen/manga-scrapper/domain"
-	"github.com/bigscreen/manga-scrapper/logger"
+	"github.com/bigscreen/manga-scrapper/errors"
 )
 
 type ChapterDetailsPageScrapper interface {
@@ -17,12 +17,12 @@ func NewChapterDetailsPageScrapper() ChapterDetailsPageScrapper {
 }
 
 func (c chapterDetailsScrapper) GetContent(path string) (domain.Chapter, error) {
+	const op = "ChapterDetailsPageScrapper.GetContent"
 	waitSelector := `document.querySelector("#node-337513")`
 	wantedSelector := `document.querySelector("body > section > div > div > div > div > section > div")`
 	document, err := getCrawledHtmlDocument(buildPageURL(path), waitSelector, wantedSelector)
 	if err != nil {
-		logger.Error("GetChapterDetailsContent, failed to get html document, err:", err)
-		return domain.Chapter{}, err
+		return domain.Chapter{}, errors.New(errors.WithOp(op), errors.WithError(err))
 	}
 
 	return c.buildReaderContent(document), nil

@@ -1,9 +1,16 @@
 package contract
 
+import "github.com/bigscreen/manga-scrapper/errors"
+
 type Response struct {
-	Success      bool         `json:"success"`
-	Data         *interface{} `json:"data,omitempty"`
-	ErrorMessage string       `json:"error_message,omitempty"`
+	Success bool         `json:"success"`
+	Data    *interface{} `json:"data,omitempty"`
+	Error   *ErrorData   `json:"error,omitempty"`
+}
+
+type ErrorData struct {
+	Code    string `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
 }
 
 func NewSuccessResponse(data interface{}) Response {
@@ -14,9 +21,19 @@ func NewSuccessResponse(data interface{}) Response {
 }
 
 func NewErrorResponse(err error) Response {
+	code := ""
+	message := err.Error()
+	if e := errors.FromError(err); e != nil {
+		code = e.Code()
+		message = e.Message()
+	}
+
 	return Response{
-		Success:      false,
-		ErrorMessage: err.Error(),
+		Success: false,
+		Error: &ErrorData{
+			Code:    code,
+			Message: message,
+		},
 	}
 }
 

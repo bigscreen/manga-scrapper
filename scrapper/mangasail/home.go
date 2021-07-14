@@ -4,7 +4,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bigscreen/manga-scrapper/common"
 	"github.com/bigscreen/manga-scrapper/domain"
-	"github.com/bigscreen/manga-scrapper/logger"
+	"github.com/bigscreen/manga-scrapper/errors"
 )
 
 type HomePageScrapper interface {
@@ -18,12 +18,12 @@ func NewHomePageScrapper() HomePageScrapper {
 }
 
 func (h homeScrapper) GetContent() (domain.HomeMangas, error) {
+	const op = "HomePageScrapper.GetContent"
 	waitSelector := `document.querySelector("#block-showmanga-hot-today")`
 	wantedSelector := `document.querySelector("body > section > div > div > div.main-table > div")`
 	document, err := getCrawledHtmlDocument(common.MangasailBaseURL, waitSelector, wantedSelector)
 	if err != nil {
-		logger.Error("GetHomeContent, failed to get html document, err:", err)
-		return domain.HomeMangas{}, err
+		return domain.HomeMangas{}, errors.New(errors.WithOp(op), errors.WithError(err))
 	}
 
 	return h.buildHomeContent(document), nil

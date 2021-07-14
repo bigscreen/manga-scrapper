@@ -12,19 +12,19 @@ func GetMangaDetails(svcMap map[common.FetchServiceKey]service.FetchService) htt
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := getIdFromRequest(r)
 		if err != nil {
-			respondWith(http.StatusBadRequest, w, contract.NewErrorResponse(err))
+			responseError(w, err)
 			return
 		}
 
 		svc, err := getFetchServiceFromRequest(r, svcMap)
 		if err != nil {
-			respondWith(http.StatusBadRequest, w, contract.NewErrorResponse(err))
+			responseError(w, err)
 			return
 		}
 
 		mr, err := svc.GetMangaDetails(id)
 		if err != nil {
-			respondWith(http.StatusInternalServerError, w, contract.NewErrorResponse(err))
+			responseError(w, err)
 			return
 		}
 		respondWith(http.StatusOK, w, contract.NewSuccessResponse(mr))
