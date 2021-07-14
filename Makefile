@@ -21,7 +21,7 @@ compile: clean
 copy-config:
 	cp application.yml.sample application.yml
 
-fmt:
+fmt: imports
 	GO111MODULE=on go fmt ./...
 
 vet:
