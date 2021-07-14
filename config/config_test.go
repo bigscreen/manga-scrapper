@@ -5,10 +5,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestConfig(t *testing.T) {
+func TestConfigTestSuite(t *testing.T) {
+	suite.Run(t, new(ConfigTestSuite))
+}
+
+type ConfigTestSuite struct {
+	suite.Suite
+}
+
+func (s *ConfigTestSuite) TestConfig() {
 	configVars := map[string]string{
 		"APP_PORT":                  "4545",
 		"LOG_LEVEL":                 "debug",
@@ -20,9 +28,9 @@ func TestConfig(t *testing.T) {
 	}
 
 	Load()
-	assert.Equal(t, 4545, Port())
-	assert.Equal(t, "debug", LogLevel())
-	assert.Equal(t, time.Duration(10)*time.Second, ChromeDPTimeout())
+	s.Equal(4545, Port())
+	s.Equal("debug", LogLevel())
+	s.Equal(time.Duration(10)*time.Second, ChromeDPTimeout())
 
 	for k := range configVars {
 		_ = os.Unsetenv(k)

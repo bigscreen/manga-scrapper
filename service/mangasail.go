@@ -4,6 +4,7 @@ import (
 	"github.com/bigscreen/manga-scrapper/common"
 	"github.com/bigscreen/manga-scrapper/contract"
 	"github.com/bigscreen/manga-scrapper/domain"
+	"github.com/bigscreen/manga-scrapper/logger"
 	"github.com/bigscreen/manga-scrapper/scrapper/mangasail"
 )
 
@@ -24,6 +25,7 @@ func NewMangsailService(params MangasailServiceParams) FetchService {
 func (m mangasailService) GetHomeCards() (contract.Home, error) {
 	c, err := m.HomeScrapper.GetContent()
 	if err != nil {
+		logger.Error("mangasailService, failed to get home content, ", err)
 		return contract.Home{}, err
 	}
 
@@ -41,6 +43,7 @@ func (m mangasailService) GetHomeCards() (contract.Home, error) {
 func (m mangasailService) GetMangaDetails(mangaId string) (contract.Manga, error) {
 	c, err := m.MangaDetailsScrapper.GetContent(m.buildPath(mangaId))
 	if err != nil {
+		logger.Error("mangasailService, failed to get manga details, ", err)
 		return contract.Manga{}, err
 	}
 
@@ -72,6 +75,7 @@ func (m mangasailService) GetMangaDetails(mangaId string) (contract.Manga, error
 func (m mangasailService) GetChapterDetails(chapterId string) (contract.Chapter, error) {
 	c, err := m.ChapterDetailsScrapper.GetContent(m.buildPath(chapterId))
 	if err != nil {
+		logger.Error("mangasailService, failed to get chapter details content, ", err)
 		return contract.Chapter{}, err
 	}
 

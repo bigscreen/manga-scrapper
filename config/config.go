@@ -28,9 +28,9 @@ func Load() {
 	_ = viper.ReadInConfig()
 
 	appConfig = &Config{
-		port:            getIntOrPanic("APP_PORT"),
-		logLevel:        fatalGetString("LOG_LEVEL"),
-		chromeDPTimeout: getIntOrPanic("CHROME_DP_TIMEOUT_SECONDS"),
+		port:            mustGetInt("APP_PORT"),
+		logLevel:        mustGetString("LOG_LEVEL"),
+		chromeDPTimeout: mustGetInt("CHROME_DP_TIMEOUT_SECONDS"),
 	}
 }
 
